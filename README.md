@@ -143,9 +143,15 @@ Chips acima da lista (numa barra que rola na horizontal; no computador a roda do
 ## Compartilhar
 
 - Cada laudo tem um link direto: `.../#c=<id>` (o endereço da barra já muda ao escolher um item). Abrir o link seleciona o laudo.
-- O botão **Compartilhar** abre um diálogo com o link, "Copiar link" e atalhos para WhatsApp, Facebook, X, Telegram e e-mail. Em celular com suporte, aparece também o menu nativo de compartilhar (que inclui o Instagram).
-- **Limites:** o Instagram não oferece link de compartilhamento para sites, então só há "copiar e colar" ou o menu nativo. A prévia do link (título, descrição e `og.png`) é **a mesma para qualquer laudo**, porque o site é estático e os servidores das redes não leem o `#`. Prévia por laudo exigiria uma página por item.
+- O botão **Compartilhar** abre um diálogo só com o link e o botão "Copiar link". Em celular com suporte, aparece também "Mais opções", que abre o menu nativo de compartilhar do aparelho (WhatsApp, Instagram etc.). Não há botões de redes sociais de propósito: o diálogo fica simples, e o menu nativo cobre as redes instaladas.
+- **Limite técnico (só para quem mantém o site):** a prévia do link (título, descrição e `og.png`) é **a mesma para qualquer laudo**, porque o site é estático e os servidores das redes não leem o `#`. Prévia por laudo exigiria uma página por item.
 - As tags `og:url`, `og:image` e `canonical` apontam para `https://mikeias-lab.github.io/mitos-de-boteco/`. Se o endereço mudar, atualize `src/html/head.html`.
+
+## Texto visível ao usuário
+
+Tudo o que aparece na tela fala **com quem usa o site**. Explicações de como o projeto funciona, limitações técnicas, decisões de design e notas para quem mantém o site ficam **só no README e em comentários de código**, nunca em hints, diálogos, rodapé ou fichas. Exemplo do que NÃO pode aparecer: "o Instagram não tem botão de compartilhar", "a prévia é a mesma para todos os laudos". O teste unitário barra alguns sinais óbvios (nome de arquivo, comando, "Claude", "README"), mas a revisão do texto continua sendo humana.
+
+Diferente disso, a procedência dos números (fonte, estimativa do modelo, observação do projeto) é informação útil ao usuário e **deve** aparecer nas fichas.
 
 ## Decisões de conteúdo (resumo do que foi combinado)
 

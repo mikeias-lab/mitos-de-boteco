@@ -460,7 +460,6 @@ details.fold .fold-body { display: flex; flex-direction: column; gap: 14px; padd
 .share-texto { font-weight: 600; line-height: 1.4; }
 .share-link { display: flex; gap: 8px; flex-wrap: wrap; }
 .share-link .input { flex: 1 1 200px; min-width: 0; }
-.share-redes { display: flex; flex-wrap: wrap; gap: 8px; }
 </style>
 </head>
 <body>
@@ -714,9 +713,7 @@ details.fold .fold-body { display: flex; flex-direction: column; gap: 14px; padd
       <button type="button" class="btn" id="share-copiar">Copiar link</button>
     </div>
     <p class="toast" id="share-aviso" role="status" aria-live="polite"></p>
-    <div class="share-redes" id="share-redes"></div>
-    <button type="button" class="btn ghost" id="share-nativo" hidden>Mais opções do celular (Instagram e outros)</button>
-    <p class="hint">O Instagram não tem um botão de compartilhar link para sites: copie o link e cole no story, na bio ou numa conversa. A prévia do link mostra o mesmo cartão do site para qualquer laudo.</p>
+    <button type="button" class="btn ghost" id="share-nativo" hidden>Mais opções</button>
   </div>
 </dialog>
 
@@ -4456,27 +4453,9 @@ function dadosCompartilhar() {
 function abrirCompartilhar() {
   if (!modeloAtual) return;
   const d = dadosCompartilhar();
-  const enc = encodeURIComponent;
   $('share-texto').textContent = d.texto;
   $('share-url').value = d.url;
   $('share-aviso').textContent = '';
-  const redes = [
-    ['WhatsApp', 'https://wa.me/?text=' + enc(d.texto + ' ' + d.url)],
-    ['Facebook', 'https://www.facebook.com/sharer/sharer.php?u=' + enc(d.url)],
-    ['X', 'https://twitter.com/intent/tweet?text=' + enc(d.texto) + '&url=' + enc(d.url)],
-    ['Telegram', 'https://t.me/share/url?url=' + enc(d.url) + '&text=' + enc(d.texto)],
-    ['E-mail', 'mailto:?subject=' + enc('Rastreador de Mitos de Boteco') + '&body=' + enc(d.texto + '\n' + d.url)]
-  ];
-  const box = $('share-redes');
-  box.textContent = '';
-  redes.forEach(([nome, href]) => {
-    const a = document.createElement('a');
-    a.className = 'btn ghost';
-    a.href = href;
-    a.textContent = nome;
-    if (href.indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
-    box.appendChild(a);
-  });
   $('share-nativo').hidden = typeof navigator.share !== 'function';
   const dlg = $('dlg-share');
   if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
