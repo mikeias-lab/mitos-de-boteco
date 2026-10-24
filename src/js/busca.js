@@ -65,7 +65,7 @@ function expandir(w) {
   const r = raizDe(w);
   const saida = new Set([r]);
   GRUPOS.forEach((g) => {
-    if (g.some((m) => (m.length >= 3 && (w.startsWith(m) || m.startsWith(r))) || m === w)) g.forEach((m) => saida.add(raizDe(m)));
+    if (g.some((m) => (m.length >= 3 && (w.startsWith(m) || (r.length >= 5 && m.startsWith(r)))) || m === w)) g.forEach((m) => saida.add(raizDe(m)));
   });
   return [...saida];
 }

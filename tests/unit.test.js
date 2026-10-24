@@ -4,9 +4,9 @@ const fs = require('fs'); const path = require('path');
 const SRC = path.join(__dirname, '..', 'src');
 const E = require(path.join(SRC, 'js', 'engine.js'));
 global.CENARIOS = null;
-const ARQUIVOS = ['data.js','data_b1.js','data_b2.js','data_b3.js','data_b4.js','data_b5.js','data_b6.js','data_b7.js','data_cats.js','data_perigo.js','data_certo.js'];
+const ARQUIVOS = ['data.js','data_b1.js','data_b2.js','data_b3.js','data_b4.js','data_b5.js','data_b6.js','data_b7.js','data_b8.js','data_cats.js','data_perigo.js','data_certo.js','data_popular.js'];
 let src = ARQUIVOS.map(f => fs.readFileSync(path.join(SRC, 'data', f), 'utf8')).join('\n')
-  .replace(/const (CENARIOS|PERFIS|OPCOES|REGRAS_TEXTO|CERTO|CERTO_CAT|PERIGO|PERIGO_TEXTO|PERIGO_TITULO)\b/g, 'global.$1');
+  .replace(/const (CENARIOS|PERFIS|OPCOES|REGRAS_TEXTO|CERTO|CERTO_CAT|PERIGO|PERIGO_TEXTO|PERIGO_TITULO|POPULARES)\b/g, 'global.$1');
 eval(src);
 const rows=[]; const problems=[];
 for (const c of CENARIOS){
@@ -34,6 +34,7 @@ for (const k of Object.keys(PERIGO)) { if(!ids.has(k)) problems.push('PERIGO sem
 for (const c of CENARIOS) if(!CERTO[c.id]) problems.push('sem CERTO: '+c.id);
 for (const r of rows) { const id=r._id; const pg=(PERIGO[id]||{}).nivel; if(pg==='critico' && r.selo!=='PERIGO GRAVE') problems.push('critico sem carimbo '+id); if(pg && r.selo==='APROVADO') problems.push('perigoso APROVADO '+id); if(!pg && r.R>=45) console.log('AVISO sem perigo e R>=45:', id, r.R, r.selo); }
 console.log('com perigo:', Object.keys(PERIGO).length, '| critico:', Object.values(PERIGO).filter(p=>p.nivel==='critico').length);
+for (const id of POPULARES) if (!ids.has(id)) problems.push('POPULARES sem cenário: '+id);
 const vistos = new Set(); for (const c of CENARIOS) { if (vistos.has(c.id)) problems.push('id duplicado: '+c.id); vistos.add(c.id); }
 if (process.argv.includes('--tabela')) console.table(rows.map(({_id, ...r}) => r));
 console.log('cenários:', CENARIOS.length, '| linhas simuladas:', rows.length, '| problemas:', problems.length);

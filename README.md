@@ -36,6 +36,7 @@ Testes no navegador: `pip install playwright && playwright install chromium`, de
 
 ```
 index.html            gerado (é o que o GitHub Pages serve)
+og.png                cartão de prévia do link (1200x630), usado nas tags og:image
 src/
   html/head.html      <head>: metadados, favicon, fontes
   html/body.html      marcação da página (cabeçalho, catálogo, laudo, rodapé, diálogo)
@@ -46,16 +47,17 @@ src/
   js/ui.js            estado, laudo, alerta de perigo, cálculo do modo custom
   js/ui2.js           teste de estresse, catálogo, formulário custom, init()
   data/data.js        regras de texto + cenários originais (CENARIOS)
-  data/data_b1..b7.js lotes de cenários (cada lote faz CENARIOS.push(...))
+  data/data_b1..b8.js lotes de cenários (cada lote faz CENARIOS.push(...))
   data/data_cats.js   perfis das 11 categorias do modo custom
   data/data_perigo.js nível de perigo por cenário + regras de texto do modo custom
   data/data_certo.js  "jeito certo" de cada cenário
+  data/data_popular.js ids do filtro "Mais famosos" (escolha editorial)
 scripts/build.js      concatena tudo em index.html
 tests/unit.test.js    testes em Node
 tests/e2e/            testes em navegador (Python + Playwright)
 ```
 
-A **ordem dos arquivos** no build importa (tudo vira um único `<script>`): motor → dados → `busca.js` → `ui.js` → `ui2.js`. Ela está listada em `scripts/build.js`. Um lote de dados novo precisa ser adicionado a essa lista **e** à lista `ARQUIVOS` em `tests/unit.test.js`.
+A **ordem dos arquivos** no build importa (tudo vira um único `<script>`): motor → dados → `busca.js` → `ui.js` → `ui2.js`. Ela está listada em `scripts/build.js`. Um arquivo de dados novo precisa ser adicionado a essa lista **e** à lista `ARQUIVOS` em `tests/unit.test.js`.
 
 ## Como o laudo é calculado (`src/js/engine.js`)
 
@@ -125,24 +127,43 @@ Mexa só em dados. **O motor e a interface não mudam.**
 3. **`data_perigo.js`**, **se houver risco real** (eletricidade, gás, fogo, produto químico, freio/direção, remédio/saúde): entrada em `PERIGO` com `nivel`, `tipos`, `quando` e `nunca` (a regra de ouro). Na dúvida, marque `atencao`.
 4. `npm test` (valida estrutura, ordem dos passos, alertas) e depois `npm run build`.
 5. Se criou arquivo novo de lote: incluí-lo em `scripts/build.js` e em `tests/unit.test.js`.
+6. Opcional: se o item for dos mais conhecidos, acrescente o id em `data_popular.js` (filtro "Mais famosos").
 
 **Cuidados com a fonte:** só afirme na ficha e no veredito o que a fonte realmente diz; o que for raciocínio nosso deve estar marcado como tal ("observação do projeto"). Prefira fonte forte (órgão público, fabricante, universidade, imprensa séria). Site de dicas e estilo de vida serve para provar que o mito é *popular*, não que ele *funciona*. Não invente fonte, preço nem estudo.
+
+## Filtros do catálogo
+
+Chips acima da lista (numa barra que rola na horizontal; no computador a roda do mouse também rola de lado). Clicar de novo no chip ativo volta a "Todos".
+
+- **Mais famosos:** escolha editorial do projeto (`data_popular.js`). **Não é medição de popularidade.**
+- **Aprovados:** só os que recebem o carimbo APROVADO. Ficam poucos de propósito: o carimbo é difícil de ganhar. COM RESSALVAS não entra.
+- **Com alerta:** itens com aviso de perigo (`PERIGO`).
+- Uma categoria por chip.
+
+## Compartilhar
+
+- Cada laudo tem um link direto: `.../#c=<id>` (o endereço da barra já muda ao escolher um item). Abrir o link seleciona o laudo.
+- O botão **Compartilhar** abre um diálogo com o link, "Copiar link" e atalhos para WhatsApp, Facebook, X, Telegram e e-mail. Em celular com suporte, aparece também o menu nativo de compartilhar (que inclui o Instagram).
+- **Limites:** o Instagram não oferece link de compartilhamento para sites, então só há "copiar e colar" ou o menu nativo. A prévia do link (título, descrição e `og.png`) é **a mesma para qualquer laudo**, porque o site é estático e os servidores das redes não leem o `#`. Prévia por laudo exigiria uma página por item.
+- As tags `og:url`, `og:image` e `canonical` apontam para `https://mikeias-lab.github.io/mitos-de-boteco/`. Se o endereço mudar, atualize `src/html/head.html`.
 
 ## Decisões de conteúdo (resumo do que foi combinado)
 
 - **Tom:** comédia leve com base em fonte, não manual técnico. Itens muito técnicos ou de nicho foram removidos (por exemplo: esmerilhadeira sem proteção, óleo de carro em moto, WD-40 em corrente, gato de energia, terra no neutro).
 - **Segurança:** o site nunca ensina a executar procedimento perigoso passo a passo; ele diz por que é perigoso e qual é o jeito certo.
+- **Fonte fraca, item fora:** ideias sem fonte aproveitável não entram (ficaram de fora, por exemplo, Super Bonder em corte e esmalte incolor na trinca do para-brisa).
 - **Só entram mitos que "funcionam ou não funcionam".** As métricas medem "o truque dá resultado?". Crenças puras (simpatia, superstição) ficaram de fora; um formato "mito ou verdade" separado seria o caminho, se um dia fizer falta.
 
 ## Limitações conhecidas (honestidade)
 
 - Números de R$, tempos do teste de estresse, fatores e níveis de perigo são **estimativas do projeto**, não dados medidos.
 - Várias fontes são sites de notícia/estilo de vida, não estudos. Valem para "o mito existe", e não para "o mito funciona".
-- A busca de parecidos casa **palavras, não sentido**: 46 de 48 frases da bateria de teste (`tests/e2e/busca.py`) dão o resultado esperado. Falhas conhecidas: "colar o retrovisor com durex" (acha itens de fita sem relação) e frases de uma palavra só ("fio").
+- A busca de parecidos casa **palavras, não sentido**: 59 de 61 frases da bateria de teste (`tests/e2e/busca.py`) dão o resultado esperado. Falhas conhecidas: "colar o retrovisor com durex" (acha itens de fita sem relação) e frases de uma palavra só ("fio").
 - Testado em Chromium (desktop e 390 px). **Safari e Firefox não foram testados.**
 - O alerta automático do modo "Minha gambiarra" é heurístico.
 - As fontes (Google Fonts) dependem de internet. Offline, entram as fontes do sistema.
-- Metadados de compartilhamento: não há `og:image` nem `canonical`, porque dependem do endereço final. Quando o domínio existir, adicionar em `src/html/head.html`.
+- A prévia de compartilhamento é a mesma para todos os laudos (ver "Compartilhar").
+- Quase todas as fontes do lote 5 são reportagens de um site só por item; a ficha de cada item diz o que a fonte afirma e o que é observação do projeto.
 
 ## Hospedagem (GitHub Pages)
 

@@ -4,7 +4,7 @@ import asyncio
 from playwright.async_api import async_playwright
 from helpers import abrir, Relatorio
 
-MINIMO = 46  # de 48; ver README (limitações conhecidas)
+MINIMO = 59  # de 61; ver README (limitações conhecidas)
 CASOS = [
  ('colar o retrovisor com durex', None),
  ('celular caiu na água', 'arroz'),
@@ -52,6 +52,19 @@ CASOS = [
  ('sal na mancha de vinho', 'sal-vinho'),
  ('pasta de dente na queimadura', 'pasta-dente-queimadura'),
  ('vitamina b contra pernilongo', 'vitamina-b-repelente'),
+ ('ar condicionado no 16 gela mais rápido', 'ar-condicionado-16'),
+ ('esquentar a casa com o forno do fogão', 'fogao-aquecer-casa'),
+ ('lápis no zíper que travou', 'lapis-ziper'),
+ ('colocar sal e gelo na cerveja', 'cerveja-sal-gelo'),
+ ('esqueci a cerveja no freezer', 'cerveja-freezer'),
+ ('colher de pau para a água não transbordar', 'colher-pau-panela'),
+ ('sal na água do macarrão ferve mais rápido', 'sal-macarrao'),
+ ('sopa ficou salgada batata', 'batata-sopa-salgada'),
+ ('bicarbonato para tirar cheiro da geladeira', 'bicarbonato-geladeira'),
+ ('esponja no micro-ondas', 'esponja-microondas'),
+ ('limpar prata com papel alumínio', 'prata-aluminio'),
+ ('tirar o carregador da tomada economiza energia', 'carregador-tomada'),
+ ('lavar o carro com detergente', 'detergente-carro'),
  ('xyz abc', None),
  ('fio', None),
 ]
