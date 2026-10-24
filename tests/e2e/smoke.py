@@ -20,16 +20,25 @@ async def main():
         # ---------- desktop ----------
         pg, erros = await abrir(b, 1280, 900)
         R.check('html lang=pt-BR', await pg.evaluate("document.documentElement.lang") == 'pt-BR')
-        R.check('catálogo tem 59 itens', await pg.locator('#lista .cen').count() == 59, await pg.locator('#lista .cen').count())
+        N = await pg.evaluate('CENARIOS.length')
+        R.check('catálogo mostra todos os cenários', await pg.locator('#lista .cen').count() == N, N)
         R.check('CSS próprio aplicado (flex + fundo escuro)',
                 await pg.evaluate("getComputedStyle(document.querySelector('.flex')).display") == 'flex'
                 and await pg.evaluate("getComputedStyle(document.body).backgroundColor") == 'rgb(20, 17, 15)')
         R.check('aviso de humor visível', await pg.locator('.aviso').is_visible())
         R.check('sem barra horizontal (desktop)', await pg.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth"))
 
-        # lista não cria segunda barra de rolagem no desktop
-        ov = await pg.evaluate("getComputedStyle(document.getElementById('lista')).overflowY")
-        R.check('lista sem rolagem interna (desktop)', ov in ('visible', 'clip'), ov)
+        # desktop: só a lista rola; busca e categorias ficam parados
+        info = await pg.evaluate("""()=>{const f=document.querySelector('.ficha'),l=document.getElementById('lista'),b=document.getElementById('busca');
+          const y0=b.getBoundingClientRect().top; l.scrollTop=400; const y1=b.getBoundingClientRect().top;
+          return {fichaRola:f.scrollHeight>f.clientHeight+1, listaRola:l.scrollHeight>l.clientHeight+1, buscaMoveu:Math.abs(y1-y0)>1}}""")
+        R.check('desktop: lista rola sozinha', info['listaRola'], info)
+        R.check('desktop: busca fica parada ao rolar a lista', not info['buscaMoveu'], info)
+        R.check('desktop: ficha sem segunda barra', not info['fichaRola'], info)
+        chips = await pg.evaluate("(()=>{const c=document.getElementById('cat-chips');return {rola:c.scrollWidth>c.clientWidth, nowrap:getComputedStyle(c).flexWrap}})()")
+        R.check('categorias em barra horizontal', chips['rola'] and chips['nowrap'] == 'nowrap', chips)
+        sobre = await pg.evaluate("[...document.querySelectorAll('#lista .cen')].filter(e=>e.scrollHeight>e.clientHeight+1).length")
+        R.check('linhas da lista sem texto vazando (desktop)', sobre == 0, sobre)
 
         # selos e alertas
         await pg.click('#lista .cen[data-id="gas-fosforo"]')
@@ -49,9 +58,31 @@ async def main():
         filtrado = await pg.locator('#lista .cen').count()
         await pg.click('#cat-chips button[data-c="Elétrica"]')
         R.check('filtro Elétrica reduz e segundo clique volta a Todos', 0 < filtrado < todos and await pg.locator('#lista .cen').count() == todos)
-        await pg.click('#cat-chips button[data-c="__perigo"]')
-        R.check('chip "Com alerta" filtra', 0 < await pg.locator('#lista .cen').count() < todos)
+        for chip, nome in (('__perigo', 'Com alerta'), ('__famosos', 'Mais famosos'), ('__aprovados', 'Aprovados')):
+            await pg.click('#cat-chips button[data-c="%s"]' % chip)
+            n = await pg.locator('#lista .cen').count()
+            R.check('chip "%s" filtra' % nome, 0 < n < todos, n)
+        sel = await pg.evaluate("[...document.querySelectorAll('#lista .cen .sb')].map(e=>e.textContent)")
+        R.check('"Aprovados" só tem carimbo APROVADO', len(sel) > 0 and all(x.strip().upper().startswith('APROV') for x in sel), sel)
         await pg.click('#cat-chips button[data-c="Todos"]')
+
+        # link direto e compartilhar
+        await pg.click('#lista .cen[data-id="sal-macarrao"]')
+        R.check('escolher item grava #c=id no endereço', (await pg.evaluate('location.hash')) == '#c=sal-macarrao')
+        await pg.click('#btn-compartilhar')
+        R.check('"Compartilhar" abre o diálogo', await pg.evaluate("document.getElementById('dlg-share').open"))
+        url = await pg.input_value('#share-url')
+        R.check('link compartilhado leva o id do laudo', url.endswith('#c=sal-macarrao'), url)
+        hrefs = await pg.eval_on_selector_all('#share-redes a', 'els=>els.map(e=>e.href)')
+        R.check('redes: WhatsApp, Facebook, X, Telegram e e-mail',
+                len(hrefs) == 5 and any('wa.me' in h for h in hrefs) and any('facebook.com/sharer' in h for h in hrefs)
+                and any('twitter.com/intent' in h for h in hrefs) and any('t.me/share' in h for h in hrefs) and any(h.startswith('mailto:') for h in hrefs), hrefs)
+        await pg.keyboard.press('Escape')
+        pl, el = await abrir(b, 1280, 900)
+        await pl.goto(url.replace('file://', 'file://'), wait_until='domcontentloaded')
+        await pl.reload()
+        await pl.wait_for_selector('#lista .cen', state='attached')
+        R.check('abrir o link seleciona o laudo certo', (await pl.inner_text('#t-laudo')).startswith('Sal na água'), await pl.inner_text('#t-laudo'))
 
         # laudo completo (diálogo)
         await pg.click('#lista .cen[data-id="gas-fosforo"]')
@@ -76,6 +107,8 @@ async def main():
         R.check('sem barra horizontal (390px)', await pm.evaluate("document.documentElement.scrollWidth<=document.documentElement.clientWidth"),
                 await pm.evaluate("document.documentElement.scrollWidth"))
         await pm.click('#cat-toggle')
+        sobre_m = await pm.evaluate("[...document.querySelectorAll('#lista .cen')].filter(e=>e.scrollHeight>e.clientHeight+1).length")
+        R.check('linhas da lista sem texto vazando (celular)', sobre_m == 0, sobre_m)
         await pm.click('#lista .cen[data-id="regua-cascata"]')
         R.check('celular: selo visível após escolher item', await pm.locator('#selo').is_visible())
         R.check('sem erros de JS/console (celular)', not erros_m, erros_m)

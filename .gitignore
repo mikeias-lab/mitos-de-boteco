@@ -1,5 +1,6 @@
 node_modules/
 *.png
+!og.png
 __pycache__/
 .DS_Store
 .vscode/

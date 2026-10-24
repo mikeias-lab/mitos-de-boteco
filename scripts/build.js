@@ -12,8 +12,8 @@ const ler = (...p) => fs.readFileSync(path.join(SRC, ...p), 'utf8');
 
 // Ordem importa: os arquivos viram um único <script> e compartilham o escopo.
 const DADOS = [
-  'data.js', 'data_b1.js', 'data_b2.js', 'data_b3.js', 'data_b4.js', 'data_b5.js', 'data_b6.js', 'data_b7.js',
-  'data_cats.js', 'data_perigo.js', 'data_certo.js',
+  'data.js', 'data_b1.js', 'data_b2.js', 'data_b3.js', 'data_b4.js', 'data_b5.js', 'data_b6.js', 'data_b7.js', 'data_b8.js',
+  'data_cats.js', 'data_perigo.js', 'data_certo.js', 'data_popular.js',
 ];
 const UI = ['busca.js', 'ui.js', 'ui2.js'];
 

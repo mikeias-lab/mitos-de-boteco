@@ -116,19 +116,28 @@ function filtrados() {
   const q = semAcento(state.busca.trim());
   return CENARIOS.filter((c) => {
     if (state.filtroCat === '__perigo') { if (!c._pn) return false; }
+    else if (state.filtroCat === '__famosos') { if (!POPULARES.has(c.id)) return false; }
+    else if (state.filtroCat === '__aprovados') { if (c._selo.texto !== 'APROVADO') return false; }
     else if (state.filtroCat !== 'Todos' && c.categoria !== state.filtroCat) return false;
     if (!q) return true;
     return semAcento(c.titulo + ' ' + c.resumo + ' ' + c.categoria).includes(q);
   });
 }
 
+/* Filtros especiais (os que não são categoria): rótulo, classe extra e como contar */
+const FILTROS_ESPECIAIS = [
+  { id: '__famosos', rotulo: 'Mais famosos', cls: '', conta: (c) => POPULARES.has(c.id) },
+  { id: '__aprovados', rotulo: 'Aprovados', cls: ' ok', conta: (c) => c._selo.texto === 'APROVADO' },
+  { id: '__perigo', rotulo: 'Com alerta', cls: ' pg', conta: (c) => !!c._pn }
+];
+
 function montarChipsCat() {
-  const cats = ['Todos', '__perigo'].concat([...new Set(CENARIOS.map((c) => c.categoria))]);
-  $('cat-chips').innerHTML = cats.map((c) => {
-    const pg = c === '__perigo';
-    const n = c === 'Todos' ? CENARIOS.length : pg ? CENARIOS.filter((x) => x._pn).length : CENARIOS.filter((x) => x.categoria === c).length;
-    return '<button type="button" class="cat-chip' + (pg ? ' pg' : '') + '" data-c="' + esc(c) + '" aria-pressed="' + (c === state.filtroCat) + '">' + (pg ? 'Com alerta' : esc(c)) + ' · ' + n + '</button>';
-  }).join('');
+  const chip = (id, rotulo, n, cls) => '<button type="button" class="cat-chip' + cls + '" data-c="' + esc(id) + '" aria-pressed="' + (id === state.filtroCat) + '">' + esc(rotulo) + ' · ' + n + '</button>';
+  const cats = [...new Set(CENARIOS.map((c) => c.categoria))];
+  $('cat-chips').innerHTML =
+    chip('Todos', 'Todos', CENARIOS.length, '') +
+    FILTROS_ESPECIAIS.map((f) => chip(f.id, f.rotulo, CENARIOS.filter(f.conta).length, f.cls)).join('') +
+    cats.map((c) => chip(c, c, CENARIOS.filter((x) => x.categoria === c).length, '')).join('');
 }
 
 /* Marca visível nos itens que pedem atenção (o item grave já tem o selo PERIGO) */
@@ -152,8 +161,18 @@ function montarLista() {
   $('resumo-cenario').textContent = cenarioAtual().resumo;
 }
 
+/* Link direto para um laudo: #c=<id>. Funciona em qualquer endereço onde o site esteja publicado. */
+function idDoHash() {
+  const m = /^#c=([a-z0-9-]+)$/.exec(location.hash);
+  return m && CENARIOS.some((c) => c.id === m[1]) ? m[1] : null;
+}
+function marcarHash() {
+  try { history.replaceState(null, '', '#c=' + state.cenarioId); } catch (e) { /* sem histórico: ignora */ }
+}
+
 function escolherCenario(id, fechar) {
   state.cenarioId = id;
+  marcarHash();
   const c = cenarioAtual();
   if (c.variantes) state.varianteId = c.variantes[0].id;
   montarLista();
@@ -271,7 +290,63 @@ function fecharLaudo() {
   if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open');
 }
 
+/* ============================================================
+   COMPARTILHAR — link do laudo + botões das redes (sem scripts de terceiros)
+   ============================================================ */
+function dadosCompartilhar() {
+  const base = location.href.split('#')[0];
+  const selo = modeloAtual ? modeloAtual.r.selo.texto : '';
+  if (state.modo === 'pronto') {
+    return { url: base + '#c=' + state.cenarioId, texto: '"' + cenarioAtual().titulo + '": carimbo ' + selo + ' no Rastreador de Mitos de Boteco.' };
+  }
+  return { url: base, texto: 'Minha gambiarra recebeu o carimbo ' + selo + ' no Rastreador de Mitos de Boteco.' };
+}
+
+function abrirCompartilhar() {
+  if (!modeloAtual) return;
+  const d = dadosCompartilhar();
+  const enc = encodeURIComponent;
+  $('share-texto').textContent = d.texto;
+  $('share-url').value = d.url;
+  $('share-aviso').textContent = '';
+  const redes = [
+    ['WhatsApp', 'https://wa.me/?text=' + enc(d.texto + ' ' + d.url)],
+    ['Facebook', 'https://www.facebook.com/sharer/sharer.php?u=' + enc(d.url)],
+    ['X', 'https://twitter.com/intent/tweet?text=' + enc(d.texto) + '&url=' + enc(d.url)],
+    ['Telegram', 'https://t.me/share/url?url=' + enc(d.url) + '&text=' + enc(d.texto)],
+    ['E-mail', 'mailto:?subject=' + enc('Rastreador de Mitos de Boteco') + '&body=' + enc(d.texto + '\n' + d.url)]
+  ];
+  const box = $('share-redes');
+  box.textContent = '';
+  redes.forEach(([nome, href]) => {
+    const a = document.createElement('a');
+    a.className = 'btn ghost';
+    a.href = href;
+    a.textContent = nome;
+    if (href.indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    box.appendChild(a);
+  });
+  $('share-nativo').hidden = typeof navigator.share !== 'function';
+  const dlg = $('dlg-share');
+  if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
+}
+
+function fecharCompartilhar() {
+  const dlg = $('dlg-share');
+  if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open');
+}
+
+function copiarLink() {
+  const campo = $('share-url');
+  const falhou = () => { campo.focus(); campo.select(); $('share-aviso').textContent = 'Não consegui copiar sozinho: o link está selecionado, é só copiar.'; };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(campo.value).then(() => { $('share-aviso').textContent = 'Link copiado.'; }, falhou);
+  } else falhou();
+}
+
 function init() {
+  const doLink = idDoHash();
+  if (doLink) state.cenarioId = doLink;
   montarChipsCat();
   montarCategorias();
   montarSliders();
@@ -340,6 +415,24 @@ function init() {
 
   $('btn-stress').addEventListener('click', runStress);
   $('btn-ler').addEventListener('click', abrirLaudo);
+  $('btn-compartilhar').addEventListener('click', abrirCompartilhar);
+  $('share-fechar').addEventListener('click', fecharCompartilhar);
+  $('share-copiar').addEventListener('click', copiarLink);
+  $('share-nativo').addEventListener('click', () => {
+    const d = dadosCompartilhar();
+    navigator.share({ title: 'Rastreador de Mitos de Boteco', text: d.texto, url: d.url }).catch(() => {});
+  });
+  $('dlg-share').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) fecharCompartilhar(); });
+
+  /* Categorias numa barra horizontal: a roda do mouse também rola de lado (quando há o que rolar) */
+  $('cat-chips').addEventListener('wheel', (ev) => {
+    const el = ev.currentTarget;
+    if (!ev.deltaY || ev.shiftKey || el.scrollWidth <= el.clientWidth) return;
+    const noFim = (ev.deltaY > 0 && el.scrollLeft + el.clientWidth >= el.scrollWidth - 1) || (ev.deltaY < 0 && el.scrollLeft <= 0);
+    if (noFim) return;
+    el.scrollLeft += ev.deltaY;
+    ev.preventDefault();
+  }, { passive: false });
   $('dlg-fechar').addEventListener('click', fecharLaudo);
   $('dlg-laudo').addEventListener('click', (ev) => { if (ev.target === ev.currentTarget) fecharLaudo(); });
 

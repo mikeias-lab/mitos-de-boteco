@@ -87,3 +87,19 @@ Object.assign(CERTO, {
   'pasta-dente-queimadura': 'Água limpa em temperatura ambiente por 15 a 20 minutos, sem estourar bolhas, e médico se a queimadura for séria.',
   'vitamina-b-repelente': 'Repelente de farmácia com DEET, icaridina ou IR 35, e eliminar água parada.'
 });
+
+Object.assign(CERTO, {
+  'ar-condicionado-16': 'Ajustar entre 23 e 24 °C, manter portas e janelas fechadas e fazer a limpeza dos filtros em dia. O frio chega na mesma velocidade.',
+  'fogao-aquecer-casa': 'Roupa e cobertor, frestas vedadas e, se precisar de aquecedor, um aparelho feito para isso, instalado com ventilação conforme o fabricante. Nunca fogão ou forno a gás.',
+  'lapis-ziper': 'Grafite com muito cuidado, sem forçar o cursor. Se não destravar, levar a uma costureira ou trocar o zíper.',
+  'cerveja-sal-gelo': 'Já funciona bem: gelo, água e sal em um recipiente grande, com um cronômetro para não esquecer a bebida lá.',
+  'cerveja-freezer': 'Usar um alarme de poucos minutos ou, de preferência, a mistura de gelo, água e sal, que é mais fácil de controlar.',
+  'colher-pau-panela': 'Baixar um pouco o fogo, usar uma panela mais funda e deixar a tampa entreaberta. A colher fica como bônus.',
+  'sal-macarrao': 'Salgar a água pelo sabor, sem esperar que ela ferva antes. Para ganhar tempo, usar menos água e tampar a panela.',
+  'batata-sopa-salgada': 'Aumentar o volume com água, caldo sem sal ou ingredientes sem tempero, aos poucos e provando. Evitar ferver para reduzir.',
+  'bicarbonato-geladeira': 'Tirar a fonte do cheiro, limpar prateleiras e gavetas e manter a geladeira regulada. O bicarbonato aberto fica só como apoio.',
+  'esponja-microondas': 'Trocar a esponja toda semana e deixá-la secar entre os usos, longe de sabão molhado.',
+  'prata-aluminio': 'Já funciona bem em prata pura. Para peças antigas, banhadas ou com pedras, usar produto específico ou levar a uma joalheria.',
+  'carregador-tomada': 'Não precisa se preocupar: o gasto é mínimo. O que vale é trocar carregador velho, esquentando ou com a capa danificada.',
+  'detergente-carro': 'Shampoo automotivo com pH adequado e uma cera nova de tempos em tempos. Detergente só em emergência.'
+});

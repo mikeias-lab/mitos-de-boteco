@@ -349,10 +349,17 @@ details.fold .fold-body { display: flex; flex-direction: column; gap: 14px; padd
 
 
 /* ---------- Uma barra de rolagem só na ficha de entrada (desktop) ---------- */
+/* ---------- Ficha de entrada (desktop): título, abas, busca e categorias ficam fixos; só a lista rola ---------- */
 @media (min-width: 1000px) {
-  .lista { max-height: none; overflow: visible; margin-right: 0; padding-right: 0; }
-  .cat-chips { flex-wrap: wrap; overflow: visible; padding-bottom: 0; -webkit-mask-image: none; mask-image: none; }
+  .ficha > * { flex: none; }
+  .ficha > #pane-pronto { flex: 1 1 auto; min-height: 0; }
+  #pane-pronto > .cat-body { flex: 1 1 auto; min-height: 0; }
+  #pane-pronto > .cat-body > * { flex: none; }
+  #pane-pronto > .cat-body > .lista { flex: 1 1 auto; min-height: 140px; max-height: none; }
 }
+/* Os itens da lista nunca encolhem: sem isso, alguns navegadores esmagam as linhas e o texto se sobrepõe */
+.lista > * { flex: none; }
+.cen { flex: none; position: relative; }
 
 /* ---------- Estado vazio do modo "Minha gambiarra" ---------- */
 .vazio { padding: 36px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
@@ -365,3 +372,12 @@ details.fold .fold-body { display: flex; flex-direction: column; gap: 14px; padd
 /* aviso de humor/estimativa (visível logo abaixo do cabeçalho) */
 .aviso { margin: -6px 0 18px; padding: 10px 14px; border: 1px dashed var(--line-strong); border-radius: 10px; color: var(--mut); font-size: var(--fs-xs); line-height: 1.5; }
 .aviso b { color: var(--fg); }
+.cat-chip.ok { color: var(--low); border-color: color-mix(in srgb, var(--low) 55%, transparent); }
+.cat-chip.ok[aria-pressed="true"] { background: color-mix(in srgb, var(--low) 16%, transparent); border-color: var(--low); color: var(--low); }
+
+/* ---------- Compartilhar ---------- */
+.dlg-small { width: min(480px, calc(100vw - 32px)); }
+.share-texto { font-weight: 600; line-height: 1.4; }
+.share-link { display: flex; gap: 8px; flex-wrap: wrap; }
+.share-link .input { flex: 1 1 200px; min-width: 0; }
+.share-redes { display: flex; flex-wrap: wrap; gap: 8px; }

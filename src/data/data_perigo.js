@@ -123,6 +123,19 @@ Object.assign(PERIGO, {
     nunca: 'Nunca dispense o repelente por causa de vitamina.' }
 });
 
+/* ---------- Lote 5 ---------- */
+Object.assign(PERIGO, {
+  'fogao-aquecer-casa': { nivel: 'critico', tipos: ['Intoxicação por monóxido de carbono', 'Incêndio'],
+    quando: 'Com o fogão ou o forno a gás ligado por horas em ambiente fechado, principalmente à noite: o gás se acumula e a pessoa não percebe.',
+    nunca: 'Nunca aqueça a casa com fogão ou forno a gás. Use roupa e cobertor ou um aquecedor próprio, com ventilação.' },
+  'cerveja-freezer': { nivel: 'atencao', tipos: ['Garrafa estourando', 'Corte com vidro'],
+    quando: 'Quando a bebida congela e o vidro ou a lata se rompe dentro do freezer, espalhando cacos e líquido.',
+    nunca: 'Nunca deixe garrafa no freezer sem alarme. A fonte recomenda um timer e fala em 10 a 15 minutos.' },
+  'esponja-microondas': { nivel: 'atencao', tipos: ['Incêndio no micro-ondas', 'Queimadura'],
+    quando: 'Com esponja seca, com fibra metálica ou deixada por tempo demais: ela pode esquentar muito ou faiscar (observação do projeto).',
+    nunca: 'Nunca coloque no micro-ondas esponja seca ou com fibra de aço. Só esponja sintética bem molhada, acompanhando.' }
+});
+
 /* Nome do tipo de alerta mostrado no título do banner */
 const PERIGO_TITULO = {
   critico: 'PERIGO GRAVE',
