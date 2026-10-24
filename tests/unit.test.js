@@ -35,6 +35,11 @@ for (const c of CENARIOS) if(!CERTO[c.id]) problems.push('sem CERTO: '+c.id);
 for (const r of rows) { const id=r._id; const pg=(PERIGO[id]||{}).nivel; if(pg==='critico' && r.selo!=='PERIGO GRAVE') problems.push('critico sem carimbo '+id); if(pg && r.selo==='APROVADO') problems.push('perigoso APROVADO '+id); if(!pg && r.R>=45) console.log('AVISO sem perigo e R>=45:', id, r.R, r.selo); }
 console.log('com perigo:', Object.keys(PERIGO).length, '| critico:', Object.values(PERIGO).filter(p=>p.nivel==='critico').length);
 for (const id of POPULARES) if (!ids.has(id)) problems.push('POPULARES sem cenário: '+id);
+// Texto visível ao usuário não pode conter nota interna (nome de arquivo, comando, "Claude", etc.).
+const INTERNOS = [/claude/i, /\bcomentário d[oa]\b/i, /\bTODO\b/, /readme/i, /data_[a-z0-9]+\.js/i, /\bnpm\b/i, /\bsrc\//i, /\blote \d/i, /\bpull request\b/i];
+const visivel = [fs.readFileSync(path.join(SRC, 'html', 'body.html'), 'utf8').replace(/<!--[\s\S]*?-->/g, '')];
+for (const c of CENARIOS) for (const v of (c.variantes || [c])) visivel.push(c.titulo, c.resumo, ...(v.veredito || c.veredito), ...(v.ficha || c.ficha).flat(), CERTO[c.id] || '');
+for (const t of visivel) for (const re of INTERNOS) if (re.test(t)) problems.push('texto visível com nota interna (' + re + '): ' + t.slice(0, 80));
 const vistos = new Set(); for (const c of CENARIOS) { if (vistos.has(c.id)) problems.push('id duplicado: '+c.id); vistos.add(c.id); }
 if (process.argv.includes('--tabela')) console.table(rows.map(({_id, ...r}) => r));
 console.log('cenários:', CENARIOS.length, '| linhas simuladas:', rows.length, '| problemas:', problems.length);

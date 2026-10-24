@@ -380,4 +380,3 @@ details.fold .fold-body { display: flex; flex-direction: column; gap: 14px; padd
 .share-texto { font-weight: 600; line-height: 1.4; }
 .share-link { display: flex; gap: 8px; flex-wrap: wrap; }
 .share-link .input { flex: 1 1 200px; min-width: 0; }
-.share-redes { display: flex; flex-wrap: wrap; gap: 8px; }

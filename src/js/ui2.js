@@ -305,27 +305,9 @@ function dadosCompartilhar() {
 function abrirCompartilhar() {
   if (!modeloAtual) return;
   const d = dadosCompartilhar();
-  const enc = encodeURIComponent;
   $('share-texto').textContent = d.texto;
   $('share-url').value = d.url;
   $('share-aviso').textContent = '';
-  const redes = [
-    ['WhatsApp', 'https://wa.me/?text=' + enc(d.texto + ' ' + d.url)],
-    ['Facebook', 'https://www.facebook.com/sharer/sharer.php?u=' + enc(d.url)],
-    ['X', 'https://twitter.com/intent/tweet?text=' + enc(d.texto) + '&url=' + enc(d.url)],
-    ['Telegram', 'https://t.me/share/url?url=' + enc(d.url) + '&text=' + enc(d.texto)],
-    ['E-mail', 'mailto:?subject=' + enc('Rastreador de Mitos de Boteco') + '&body=' + enc(d.texto + '\n' + d.url)]
-  ];
-  const box = $('share-redes');
-  box.textContent = '';
-  redes.forEach(([nome, href]) => {
-    const a = document.createElement('a');
-    a.className = 'btn ghost';
-    a.href = href;
-    a.textContent = nome;
-    if (href.indexOf('http') === 0) { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
-    box.appendChild(a);
-  });
   $('share-nativo').hidden = typeof navigator.share !== 'function';
   const dlg = $('dlg-share');
   if (typeof dlg.showModal === 'function') { if (!dlg.open) dlg.showModal(); } else dlg.setAttribute('open', '');
