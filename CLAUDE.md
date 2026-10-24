@@ -8,3 +8,4 @@ Leia o `README.md` inteiro antes de mexer (arquitetura, regras de perigo, como a
 - O site é **humor com estimativas**, não manual técnico. Itens muito técnicos ou de nicho saem. Gambiarra perigosa (elétrica, gás, fogo, química, freio, saúde) nunca é aprovada e leva alerta (`data_perigo.js`).
 - Todo item novo precisa de: bloco em `src/data/`, linha em `data_certo.js` e, se houver risco real, entrada em `PERIGO`. Se for dos mais conhecidos, id em `data_popular.js` (escolha editorial, não medição).
 - Comentários e mensagens de commit em português. Não adicione dependências sem necessidade (o projeto é propositalmente puro HTML/CSS/JS).
+- Fluxo com o GitHub: sempre que o dono pedir para "subir pro GitHub", isso já autoriza o merge. Crie uma branch, abra o pull request, espere o CI passar e faça o merge na `main` (o GitHub Pages publica a partir dela).
