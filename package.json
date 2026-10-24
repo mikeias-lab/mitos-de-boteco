@@ -1,0 +1,15 @@
+{
+  "name": "rastreador-mitos-de-boteco",
+  "version": "1.0.0",
+  "description": "Rastreador de Mitos de Boteco & Calculadora de Gambiarras: site de humor com laudos estimados.",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "build:check": "node scripts/build.js --check",
+    "test": "node tests/unit.test.js",
+    "test:e2e": "python3 tests/e2e/smoke.py && python3 tests/e2e/busca.py",
+    "start": "python3 -m http.server 8000"
+  },
+  "engines": { "node": ">=18" }
+}
