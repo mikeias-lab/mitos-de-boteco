@@ -1,0 +1,236 @@
+<div class="wrap">
+
+  <!-- ============ CABEÇALHO ============ -->
+  <header class="masthead">
+    <div>
+      <div class="brand">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h10v11a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"/><path d="M15 10h2.5a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H15"/><path d="M5 8c0-2 1.2-3 3-3 .8-1.2 3.2-1.2 4 0 1.8 0 3 1 3 3"/><path d="M9 12v5M12 12v5"/></svg>
+        <span class="eyebrow" style="color:inherit">Laudo técnico de balcão</span>
+      </div>
+      <h1>Rastreador de Mitos <em>de Boteco</em><br>&amp; Calculadora de Gambiarras</h1>
+    </div>
+    <p class="sub">Escolha uma gambiarra famosa ou monte a sua. O simulador estima viabilidade, risco, durabilidade e o custo real no longo prazo.</p>
+  </header>
+
+  <p class="aviso" role="note"><b>Site de humor, não manual técnico.</b> Os números são estimativas de um modelo simples, feitas para brincar e para dar uma noção, não para decidir o que fazer com gás, eletricidade, remédio ou freio. Em caso de dúvida real, chame um profissional.</p>
+
+  <main class="layout">
+
+    <!-- ============ ENTRADA ============ -->
+    <section class="panel ficha" aria-labelledby="t-entrada">
+      <div class="flex items-center justify-between gap-3">
+        <h2 id="t-entrada">Ficha de entrada</h2>
+        <span class="eyebrow">cálculo em tempo real</span>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Modo de entrada">
+        <button class="tab" role="tab" id="tab-pronto" aria-selected="true" aria-controls="pane-pronto">Cenários prontos</button>
+        <button class="tab" role="tab" id="tab-custom" aria-selected="false" aria-controls="pane-custom">Minha gambiarra</button>
+      </div>
+
+      <!-- Cenários prontos: catálogo pesquisável -->
+      <div id="pane-pronto" role="tabpanel" aria-labelledby="tab-pronto" class="flex flex-col gap-3">
+        <button type="button" class="btn ghost cat-toggle" id="cat-toggle" aria-expanded="false" aria-controls="cat-body">
+          <span class="cat-sum"><span class="eyebrow">Cenário atual</span><b id="cat-atual"></b></span>
+          <span>Trocar</span>
+        </button>
+        <div class="cat-body flex flex-col gap-3 collapsed" id="cat-body">
+          <div class="search">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="busca" class="input" type="search" placeholder="Buscar mito (ex.: arroz, fusível, pasta)" aria-label="Buscar cenário" autocomplete="off">
+          </div>
+          <div class="cat-chips" id="cat-chips" role="group" aria-label="Filtrar por categoria"></div>
+          <div class="lista" id="lista"></div>
+          <div class="flex items-center justify-between gap-3">
+            <button type="button" class="btn ghost" id="btn-sorte"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 14 4 4-4 4"/><path d="m18 2 4 4-4 4"/><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.46-8.6A4 4 0 0 1 16.03 6H22"/><path d="M2 6h1.97a4 4 0 0 1 3.3 1.7l.5.8"/><path d="M22 18h-5.97a4 4 0 0 1-3.3-1.7l-.5-.8"/></svg>Surpreenda-me</button>
+            <span class="hint mono" id="cont"></span>
+          </div>
+        </div>
+        <p id="resumo-cenario" class="hint"></p>
+      </div>
+
+      <!-- Minha gambiarra -->
+      <div id="pane-custom" role="tabpanel" aria-labelledby="tab-custom" class="flex flex-col gap-4" hidden>
+        <div class="field">
+          <label for="in-ideia">Qual é a gambiarra?</label>
+          <textarea id="in-ideia" class="textarea" placeholder=""></textarea>
+        </div>
+        <div id="parecidos" class="parecidos" hidden aria-live="polite"></div>
+
+        <div class="grid2">
+          <div class="field">
+            <label for="sel-cat">Categoria</label>
+            <select id="sel-cat" class="select"></select>
+          </div>
+          <div class="field">
+            <label for="in-orc">Orçamento estimado</label>
+            <div class="money"><span>R$</span><input id="in-orc" class="input" type="number" inputmode="decimal" min="0" max="5000" step="1" value="40"></div>
+          </div>
+        </div>
+        <p class="dica" id="dica-cat"></p>
+
+        <div class="group" id="detalhes">
+          <span class="eyebrow">Detalhes da montagem</span>
+        </div>
+
+        <details class="fold" id="fold-fatores">
+          <summary>Fatores técnicos (ajuste fino) <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+          <div class="fold-body" id="sliders"></div>
+        </details>
+
+        <div id="detectado" class="flex flex-col gap-2" hidden>
+          <span class="eyebrow">Detectei no texto</span>
+          <div class="chips" id="chips-detectado"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAUDO ============ -->
+    <section class="laudo" id="laudo" aria-labelledby="t-laudo">
+
+      <div class="panel vazio" id="vazio-custom" hidden>
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+        <h2>Conte a sua gambiarra</h2>
+        <p>Escreva a ideia ao lado ou ajuste os detalhes. O laudo aparece assim que você começar, e muda a cada letra.</p>
+      </div>
+
+      <div class="panel">
+        <div class="laudo-head">
+          <div class="min-w-0">
+            <span class="eyebrow">Objeto do laudo</span>
+            <h2 id="t-laudo"></h2>
+            <div class="meta">
+              <span id="meta-cat"></span>
+              <span id="meta-orc"></span>
+              <span id="meta-hor"></span>
+            </div>
+            <div class="actions">
+              <button type="button" class="btn ghost" id="btn-ler" aria-haspopup="dialog"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg><span>Ler laudo completo</span></button>
+            </div>
+          </div>
+          <div class="selo" id="selo" role="img"></div>
+        </div>
+        <div id="alerta" hidden></div>
+        <div class="variantes" id="variantes" hidden>
+          <span class="eyebrow">Comparar produto</span>
+          <div class="seg" id="seg-var" role="group" aria-label="Produto" style="margin-top:6px"></div>
+        </div>
+      </div>
+
+      <!-- Teste de estresse -->
+      <article class="panel stress" aria-labelledby="t-stress">
+        <div class="stress-top">
+          <h3 id="t-stress"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>Teste de estresse</h3>
+          <button class="btn" id="btn-stress" type="button"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Simular teste de estresse</span></button>
+        </div>
+        <div class="stage">
+          <div class="rig" id="rig" aria-hidden="true">
+            <svg viewBox="0 0 220 100">
+              <path class="piece half-a" d="M16 30 H108 V70 H16 a6 6 0 0 1 -6 -6 V36 a6 6 0 0 1 6 -6z"/>
+              <path class="piece half-b" d="M112 30 H204 a6 6 0 0 1 6 6 V64 a6 6 0 0 1 -6 6 H112z"/>
+              <rect class="patch" id="rig-patch" x="92" y="22" width="36" height="56" rx="9"/>
+              <polyline class="crack" data-c="0.35" points="100,24 106,38 99,48 108,60"/>
+              <polyline class="crack" data-c="0.6" points="120,76 114,62 123,52 116,40"/>
+              <polyline class="crack" data-c="0.85" points="92,50 104,46 110,56 124,50 128,54"/>
+            </svg>
+            <div class="rig-result" id="rig-result"></div>
+          </div>
+          <div class="gauge-wrap">
+            <div class="gauge-read">
+              <span class="eyebrow" id="g-var">Variável</span>
+              <span class="val" id="g-val">0<small></small></span>
+            </div>
+            <div class="gauge" id="gauge"><i></i><span class="mark" id="g-mark"></span></div>
+            <ul class="log" id="log" aria-live="polite"><li>Pronto para testar. Aperte o botão para levar a gambiarra ao limite.</li></ul>
+          </div>
+        </div>
+      </article>
+
+      <!-- Indicadores -->
+      <div class="cards" aria-live="polite">
+        <article class="panel card">
+          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>Nota de viabilidade técnica</span>
+          <div class="ring-row">
+            <div class="dial" id="ring">
+              <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="track" cx="60" cy="60" r="52"/><circle class="prog" id="ring-prog" cx="60" cy="60" r="52"/></svg>
+              <div class="num mono" id="v-nota">0<small>%</small></div>
+            </div>
+            <p class="hint" id="v-hint"></p>
+          </div>
+        </article>
+
+        <article class="panel card">
+          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>Índice de perigo</span>
+          <div class="risk-top">
+            <svg class="risk-ico" id="r-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+            <div class="big" id="r-nivel">Baixo</div>
+            <span class="pct" id="r-pct">0%</span>
+          </div>
+          <div class="meter-wrap">
+            <div class="needle" id="needle"></div>
+            <div class="meter" aria-hidden="true"><i class="z1"></i><i class="z2"></i><i class="z3"></i></div>
+          </div>
+          <div class="scale" aria-hidden="true"><span>baixo</span><span>médio · 30</span><span>extremo · 60</span></div>
+          <p class="hint" id="r-hint"></p>
+        </article>
+
+        <article class="panel card">
+          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg><span id="d-rotulo">Durabilidade estimada</span></span>
+          <div class="big mono" id="d-valor">0<small>horas</small></div>
+          <div class="cover" id="cover">
+            <div class="track"><i></i></div>
+            <span class="hint" id="cover-txt"></span>
+          </div>
+          <div class="mini">
+            <div><span>Montagens no período</span><b id="d-rep">0×</b></div>
+            <div><span>Gasto só em montagens</span><b id="d-gasto">R$ 0</b></div>
+          </div>
+        </article>
+
+        <article class="panel card">
+          <span class="lbl"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>Economia teórica</span>
+          <div class="ebars">
+            <div class="erow" style="color:var(--accent)"><span class="n">Jeito certo, comprado hoje</span><span class="v" id="e-certo" style="color:var(--fg)">R$ 0</span><div class="track"><i id="eb-certo"></i></div></div>
+            <div class="erow" id="erow-longo"><span class="n" id="n-longo">Gambiarra, custo total no período</span><span class="v" id="e-longo" style="color:var(--fg)">R$ 0</span><div class="track"><i id="eb-longo"></i></div></div>
+          </div>
+          <p class="certo"><b>Como seria o jeito certo</b><span id="e-certo-dica"></span></p>
+          <div class="saldo"><span id="e-saldo-txt">Saldo no período</span><b id="e-saldo">R$ 0</b></div>
+          <p class="hint" id="e-hint"></p>
+        </article>
+      </div>
+
+      <!-- Veredito -->
+      <article class="panel veredito">
+        <div>
+          <h3><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Veredito da engenharia</h3>
+          <div class="prose" id="veredito"></div>
+        </div>
+        <aside class="ficha-tec">
+          <h4>Ficha técnica</h4>
+          <dl id="ficha-tec"></dl>
+        </aside>
+      </article>
+
+      <!-- Como foi calculado -->
+      <details class="panel calc fold">
+        <summary>Como esses números foram calculados <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></summary>
+        <pre id="calc-pre"></pre>
+        <p class="hint" style="margin-top:12px"><b>Sobre o aviso de perigo.</b> A fórmula de risco mede probabilidade. Mas uma gambiarra que quase nunca dá errado ainda é inaceitável quando o pior desfecho é grave e irreversível. Por isso cada item tem também um nível de perigo, definido pelo pior desfecho plausível (julgamento do projeto, não medição): <b>perigo grave</b> eleva o risco para pelo menos 60% e sempre leva o carimbo PERIGO GRAVE; <b>atenção</b> eleva para pelo menos 30% e impede o selo APROVADO. No modo “Minha gambiarra” o aviso vem de palavras do texto e dos controles, e pode errar nos dois sentidos.</p>
+      </details>
+
+      <footer class="foot">
+        <p><b>Como ler este laudo.</b> Os números são estimativas de um modelo simples, ancoradas em princípios físicos e em fontes públicas. Não são medições de laboratório. Os valores em R$ são faixas de referência; confira o preço do dia. Nunca improvise em freio, direção, gás ou instalação elétrica fixa.</p>
+        <p><b>Aviso.</b> Este é um projeto de entretenimento e estudo. Não substitui orientação de eletricista, mecânico, bombeiro, médico, farmacêutico ou outro profissional habilitado, e o autor não se responsabiliza por quem tentar reproduzir as gambiarras. Os alertas de perigo são automáticos e podem errar, para os dois lados. Links de fontes levam a sites de terceiros, que podem mudar ou sair do ar.</p>
+        <ul id="fontes"></ul>
+      </footer>
+    </section>
+  </main>
+</div>
+
+<dialog id="dlg-laudo" class="dlg" aria-labelledby="dlg-titulo">
+  <div class="dlg-head">
+    <span class="eyebrow">Laudo completo</span>
+    <button type="button" class="btn ghost" id="dlg-fechar" aria-label="Fechar laudo"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg><span>Fechar</span></button>
+  </div>
+  <div class="dlg-body" id="dlg-body"></div>
+</dialog>
